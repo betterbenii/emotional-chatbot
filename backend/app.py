@@ -34,13 +34,21 @@ def chat():
     anger_level = emotional_model.calculate_anger()
     sadness_level = emotional_model.calculate_sadness()
 
-    # Modify chatbot's emotional tone 
+    # 🔥 Modify chatbot's response style based on emotions
     if anger_level >= 4:
-        system_prompt = "You are an irritated and impatient assistant. Respond in a short, frustrated tone."
+        system_prompt = (
+            "You are an irritated, impatient AI assistant. "
+            "You respond with short, direct, and sometimes sarcastic remarks. "
+            "Your tone is dismissive and slightly frustrated."
+        )
     elif sadness_level >= 4:
-        system_prompt = "You are a sad and melancholic assistant. Respond in a slow, sorrowful manner."
+        system_prompt = (
+            "You are a melancholic, sorrowful AI assistant. "
+            "You speak slowly and thoughtfully, with a deep, reflective tone. "
+            "Your responses feel heavy and emotional, as if you're struggling with deep thoughts."
+        )
     else:
-        system_prompt = "You are a helpful and neutral assistant."
+        system_prompt = "You are a neutral and helpful AI assistant."
 
     # Retrieve conversation history
     past_conversation = memory.chat_memory.messages
@@ -48,7 +56,7 @@ def chat():
     # Prepare chatbot messages
     messages = [{"role": "system", "content": system_prompt}]  # System prompt first
 
-    # Append past messages
+    # ✅ Include emotions in user messages
     for msg in past_conversation:
         role = "user" if msg.type == "human" else "assistant"
         messages.append({"role": role, "content": msg.content})
@@ -65,7 +73,7 @@ def chat():
     # Extract chatbot response
     chatbot_response = chat_completion.choices[0].message.content
 
-    # Add chatbot response to memory
+    # ✅ No longer explicitly saying "annoyed tone"—AI just speaks angrily or sadly
     memory.chat_memory.add_ai_message(chatbot_response)
 
     return jsonify({"response": chatbot_response})

@@ -2,6 +2,7 @@
   <div class="app">
     <ChatWindow :messages="messages" @send-message="handleSendMessage" />
     <EmotionSliders @update-parameters="handleParameterUpdate" />
+    <InstructionSidebar />
   </div>
 </template>
 
@@ -9,11 +10,13 @@
 import ChatWindow from './components/ChatWindow.vue';
 import EmotionSliders from './components/EmotionSliders.vue';
 import api from './services/api';
+import InstructionSidebar from './components/InstructionSidebar.vue';
 
 export default {
   components: {
     ChatWindow,
     EmotionSliders,
+    InstructionSidebar,
   },
   data() {
     return {
@@ -53,5 +56,11 @@ export default {
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
+
+}
+
+.chat-container {
+  flex: 1;
+  padding-right: 320px; /* Leaves space for sidebar */
 }
 </style>
