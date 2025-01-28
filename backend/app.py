@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from langchain.memory import ConversationBufferMemory
-from langchain.chains import ConversationChain
 from groq import Groq
 from dotenv import load_dotenv
 import os
@@ -18,9 +17,6 @@ client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 # Initialize LangChain memory
 memory = ConversationBufferMemory()
 
-
-# conversation = ConversationChain(llm=llm, memory=memory)
-
 # Endpoint to start a conversation
 @app.route("/start", methods=["POST"])
 def start_conversation():
@@ -29,35 +25,41 @@ def start_conversation():
 
 # Endpoint to send user messages
 @app.route("/chat", methods=["POST"])
-@app.route("/chat", methods=["POST"])
 def chat():
     user_message = request.json.get("message")
     if not user_message:
         return jsonify({"error": "Message is required"}), 400
 
-    # Add user message to memory
-    memory.chat_memory.add_user_message(user_message)
-    
-
     # Get emotional states
     anger_level = emotional_model.calculate_anger()
     sadness_level = emotional_model.calculate_sadness()
 
-    # Modify system prompt based on emotional state
-    system_prompt = "You are a helpful assistant."
+    # Modify chatbot's emotional tone 
     if anger_level >= 4:
-        system_prompt = "Respond assertively and angerily."   
+        system_prompt = "You are an irritated and impatient assistant. Respond in a short, frustrated tone."
     elif sadness_level >= 4:
-        system_prompt = "respond sadly and sorrowfully."
+        system_prompt = "You are a sad and melancholic assistant. Respond in a slow, sorrowful manner."
+    else:
+        system_prompt = "You are a helpful and neutral assistant."
+
+    # Retrieve conversation history
+    past_conversation = memory.chat_memory.messages
+
+    # Prepare chatbot messages
+    messages = [{"role": "system", "content": system_prompt}]  # System prompt first
+
+    # Append past messages
+    for msg in past_conversation:
+        role = "user" if msg.type == "human" else "assistant"
+        messages.append({"role": role, "content": msg.content})
+
+    # Add current user message
+    messages.append({"role": "user", "content": user_message})
 
     # Get chatbot response using Groq
     chat_completion = client.chat.completions.create(
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_message},
-        ],
-        model="mixtral-8x7b-32768", 
-         
+        messages=messages,
+        model="mixtral-8x7b-32768",
     )
 
     # Extract chatbot response
@@ -67,6 +69,7 @@ def chat():
     memory.chat_memory.add_ai_message(chatbot_response)
 
     return jsonify({"response": chatbot_response})
+
 # Endpoint to adjust Psi Theory parameters
 @app.route("/adjust_parameters", methods=["POST"])
 def adjust_parameters():
