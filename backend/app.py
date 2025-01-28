@@ -53,7 +53,7 @@ def chat():
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_message},
         ],
-        model="mixtral-8x7b-32768",  # Replace with your preferred Groq model
+        model="mixtral-8x7b-32768",  
     )
 
     # Extract chatbot response
