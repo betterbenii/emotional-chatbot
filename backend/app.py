@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 import os
 from emotional_model import emotional_model
 
-# Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
@@ -17,7 +16,7 @@ client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 # Initialize LangChain memory
 memory = ConversationBufferMemory()
 
-# Initialize conversation chain (optional, for LangChain integration)
+
 # conversation = ConversationChain(llm=llm, memory=memory)
 
 # Endpoint to start a conversation
