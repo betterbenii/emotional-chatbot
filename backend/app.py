@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationChain
 from groq import Groq
@@ -9,6 +10,7 @@ from emotional_model import emotional_model
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app)
 
 # Initialize Groq Client
 client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
@@ -35,6 +37,7 @@ def chat():
 
     # Add user message to memory
     memory.chat_memory.add_user_message(user_message)
+    
 
     # Get emotional states
     anger_level = emotional_model.calculate_anger()
@@ -43,9 +46,9 @@ def chat():
     # Modify system prompt based on emotional state
     system_prompt = "You are a helpful assistant."
     if anger_level >= 4:
-        system_prompt = "You are feeling angry. Respond assertively."
+        system_prompt = "Respond assertively and angerily."   
     elif sadness_level >= 4:
-        system_prompt = "You are feeling sad. Respond empathetically."
+        system_prompt = "respond sadly and sorrowfully."
 
     # Get chatbot response using Groq
     chat_completion = client.chat.completions.create(
@@ -53,7 +56,8 @@ def chat():
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_message},
         ],
-        model="mixtral-8x7b-32768",  
+        model="mixtral-8x7b-32768", 
+         
     )
 
     # Extract chatbot response
