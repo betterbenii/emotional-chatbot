@@ -17,6 +17,23 @@
   
   <script>
   export default {
+    /**
+     * Initial emotional parameters for the chatbot, with values ranging from 1 (extremely low) to 7 (extremely high).
+     * The parameters are:
+     * - valence: Measures the chatbot's emotional valence on a scale from extremely negative (1) to extremely positive (7).
+     * - arousal: Represents the chatbot's physiological arousal level, ranging from extremely low (1) to extremely high (7).
+     * - selection threshold: The minimum value required for the chatbot to make a decision, from extremely low (1) to extremely high (7).
+     * - resolution level: The chatbot's ability to distinguish between different objects, ranging from extremely low (1) to extremely high (7).
+     * - goal-directedness: The chatbot's motivation to achieve goals, ranging from extremely low (1) to extremely high (7).
+     * - securing rate: The chatbot's ability to secure resources, ranging from extremely low (1) to extremely high (7).
+     * @type {Object}
+     * @property {number} valence
+     * @property {number} arousal
+     * @property {number} selection_threshold
+     * @property {number} resolution_level
+     * @property {number} goal_directedness
+     * @property {number} securing_rate
+     */
     data() {
       return {
         parameters: {
@@ -30,6 +47,17 @@
       };
     },
     methods: {
+/**
+ * Updates a specific emotional parameter and emits an event.
+ *
+ * @param {string} key - The key of the parameter to update.
+ * @param {number|string} value - The new value for the parameter, which will be
+ *                                converted to a number.
+ *
+ * Emits:
+ * @event update-parameters - Emitted with the updated parameters object.
+ */
+
       updateParameter(key, value) {
         this.parameters[key] = Number(value);
         this.$emit('update-parameters', this.parameters);

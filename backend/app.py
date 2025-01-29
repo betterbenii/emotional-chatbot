@@ -20,12 +20,33 @@ memory = ConversationBufferMemory()
 # Endpoint to start a conversation
 @app.route("/start", methods=["POST"])
 def start_conversation():
-    memory.clear()  # Clear previous conversation memory
+    """
+    Clears previous conversation memory and initializes a new conversation.
+
+    Returns:
+        A JSON response with a message indicating that the conversation has been started.
+    """
+    memory.clear()  
     return jsonify({"message": "Conversation started!"})
 
 # Endpoint to send user messages
 @app.route("/chat", methods=["POST"])
 def chat():
+    """
+    Endpoint to send user messages and receive a chatbot response.
+
+    Expects a JSON payload with a "message" key containing the user's message.
+
+    Returns a JSON response with a "response" key containing the chatbot's response.
+
+    The chatbot's response style is modified based on the user's emotional state as follows:
+
+    - If the  anger level is 4 or higher, the chatbot responds with short, direct, and sometimes sarcastic remarks.
+    - If the  sadness level is 4 or higher, the chatbot speaks slowly and thoughtfully, with a deep, reflective tone.
+    - Otherwise, the chatbot responds in a neutral and helpful tone.
+
+    The chatbot's response includes the user's emotional state in the message.
+    """
     user_message = request.json.get("message")
     if not user_message:
         return jsonify({"error": "Message is required"}), 400
@@ -83,6 +104,27 @@ def chat():
 # Endpoint to adjust Psi Theory parameters
 @app.route("/adjust_parameters", methods=["POST"])
 def adjust_parameters():
+    """
+    Adjusts the Psi Theory parameters of the emotional model.
+
+    Parameters:
+        parameters (dict): A dictionary with the following structure:
+            {
+                "valence": int,
+                "arousal": int,
+                "selection_threshold": int,
+                "resolution_level": int,
+                "goal_directedness": int,
+                "securing_rate": int
+            }
+
+    Returns:
+        A JSON response with a message indicating whether the parameters were
+        successfully updated.
+
+    Raises:
+        400: If the `parameters` key is missing from the request body.
+    """
     parameters = request.json.get("parameters")
     if not parameters:
         return jsonify({"error": "Parameters are required"}), 400
@@ -92,6 +134,15 @@ def adjust_parameters():
 
 @app.route("/emotional_states", methods=["GET"])
 def get_emotional_states():
+    """
+    Retrieves the current emotional states of the chatbot.
+
+    Returns:
+        A JSON response with two keys: "anger" and "sadness", each containing
+        the current level of the respective emotion (from 1 to 5).
+
+    """
+
     anger_level = emotional_model.calculate_anger()
     sadness_level = emotional_model.calculate_sadness()
     return jsonify({"anger": anger_level, "sadness": sadness_level})

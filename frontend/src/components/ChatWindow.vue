@@ -24,12 +24,25 @@
         required: true,
       },
     },
+/**
+ * Provides component-specific reactive data properties.
+ *
+ * @returns {Object} An object containing:
+ *   - newMessage: {string} A string to hold the current input message from the user.
+ */
+
     data() {
       return {
         newMessage: '',
       };
     },
     methods: {
+      /**
+       * Emits a "send-message" event with the current input message to the parent
+       * component when the user presses Enter or clicks the Send button.
+       *
+       * Clears the input message text after sending.
+       */
       sendMessage() {
         if (this.newMessage.trim()) {
           this.$emit('send-message', this.newMessage);
